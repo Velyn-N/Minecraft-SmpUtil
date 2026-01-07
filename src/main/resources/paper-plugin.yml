@@ -1,0 +1,8 @@
+name: SmpUtil
+version: '1.0-SNAPSHOT'
+main: me.velyn.smputil.SmpUtil
+api-version: '1.21'
+prefix: SmpUtil
+load: STARTUP
+authors: [ Velyn-N ]
+description: A utility Plugin for SMP Servers
