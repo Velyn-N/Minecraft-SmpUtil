@@ -27,7 +27,13 @@ public final class SmpUtil extends JavaPlugin {
     }
 
     private void registerListeners() {
+        PluginManager pm = getServer().getPluginManager();
 
+        HandlerList.unregisterAll(this);
+
+        if (config.blockFarmlandTrample) {
+            pm.registerEvents(new TrampleBlockListener(log, config), this);
+        }
     }
 
     @Override

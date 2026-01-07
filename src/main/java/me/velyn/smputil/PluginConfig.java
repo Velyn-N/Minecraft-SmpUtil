@@ -6,9 +6,11 @@ public class PluginConfig {
 
     public boolean debug;
     public boolean blockFarmlandTrample;
+    public boolean allowFarmlandTrampleWhenSneaking;
 
     public void apply(ConfigurationSection config) {
         debug = config.getBoolean("debug", false);
         blockFarmlandTrample = config.getBoolean("block-farmland-trample", true);
+        allowFarmlandTrampleWhenSneaking = config.getBoolean("allow-farmland-trample-when-sneaking", false);
     }
 }

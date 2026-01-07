@@ -1,2 +1,3 @@
 debug: false
 block-farmland-trample: true
+allow-farmland-trample-when-sneaking: false
