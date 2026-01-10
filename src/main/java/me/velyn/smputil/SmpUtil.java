@@ -1,11 +1,15 @@
 package me.velyn.smputil;
 
+import java.util.*;
+
+import org.bukkit.command.*;
 import org.bukkit.event.*;
 import org.bukkit.plugin.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.roleplaycauldron.spellbook.core.*;
 
+import me.velyn.smputil.horsedotzip.*;
 import me.velyn.smputil.notrample.*;
 
 public final class SmpUtil extends JavaPlugin {
@@ -14,6 +18,8 @@ public final class SmpUtil extends JavaPlugin {
 
     private PluginConfig config;
 
+    private final List<Command> registeredCommands = new ArrayList<>();
+
     @Override
     public void onEnable() {
         log = new WrappedLogger(getLogger());
@@ -21,7 +27,7 @@ public final class SmpUtil extends JavaPlugin {
         saveDefaultConfig();
         reloadConfig();
 
-        getServer().getCommandMap().register(SmpUtilCommand.CMD_NAME, new SmpUtilCommand(this));
+        getServer().getCommandMap().register(this.getName(), new SmpUtilCommand(this));
 
         log.infoF("Successfully enabled SmpUtil!");
     }
@@ -36,6 +42,19 @@ public final class SmpUtil extends JavaPlugin {
         }
     }
 
+    private void registerCommands() {
+        CommandMap cm = getServer().getCommandMap();
+
+        registeredCommands.forEach(c -> c.unregister(cm));
+        registeredCommands.clear();
+
+        if (config.horseDotZip) {
+            HorseDotZipCommand horseDotZipCommand = new HorseDotZipCommand();
+            registeredCommands.add(horseDotZipCommand);
+            cm.register(this.getName(), horseDotZipCommand);
+        }
+    }
+
     @Override
     public void reloadConfig() {
         super.reloadConfig();
@@ -46,6 +65,7 @@ public final class SmpUtil extends JavaPlugin {
         log.setDebug(config.debug);
 
         registerListeners();
+        registerCommands();
         log.infoF("Successfully reloaded SmpUtil!");
     }
 
