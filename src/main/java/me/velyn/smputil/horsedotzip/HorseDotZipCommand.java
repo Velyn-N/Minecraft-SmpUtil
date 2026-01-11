@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.*;
 import org.bukkit.persistence.*;
 import org.bukkit.util.io.*;
 import org.jetbrains.annotations.*;
+import org.jspecify.annotations.*;
 import org.yaml.snakeyaml.external.biz.base64Coder.*;
 
 import com.google.gson.*;
@@ -87,12 +88,36 @@ public class HorseDotZipCommand extends Command {
 
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("Contains a compressed " + horse.getType().name().toLowerCase(), NamedTextColor.GRAY));
+        lore.add(getHorseStats(horse));
         meta.lore(lore);
 
         saddle.setItemMeta(meta);
         horse.remove();
         player.getInventory().addItem(saddle);
         player.sendMessage(Component.text("Mob compressed into saddle!", NamedTextColor.GREEN));
+    }
+
+    private Component getHorseStats(AbstractHorse horse) {
+        Component component = Component.empty();
+        AttributeInstance healthAttr = horse.getAttribute(Attribute.MAX_HEALTH);
+        if (healthAttr != null) {
+            component = component.append(
+                    Component.text("%.1f♥ ".formatted(healthAttr.getValue() / 2), TextColor.color(165, 42, 42))
+            );
+        }
+        AttributeInstance speedAttr = horse.getAttribute(Attribute.MOVEMENT_SPEED);
+        if (speedAttr != null) {
+            component = component.append(
+                    Component.text("%.4f→ ".formatted(speedAttr.getValue()), TextColor.color(205, 127, 50))
+            );
+        }
+        AttributeInstance jumpAttr = horse.getAttribute(Attribute.JUMP_STRENGTH);
+        if (jumpAttr != null) {
+            component = component.append(
+                    Component.text("%.2f↑".formatted(jumpAttr.getValue()), TextColor.color(123, 63, 0))
+            );
+        }
+        return component;
     }
 
     private JsonObject serializeMob(AbstractHorse horse) {
