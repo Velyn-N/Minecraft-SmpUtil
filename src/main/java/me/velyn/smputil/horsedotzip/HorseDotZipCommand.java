@@ -12,7 +12,6 @@ import org.bukkit.inventory.meta.*;
 import org.bukkit.persistence.*;
 import org.bukkit.util.io.*;
 import org.jetbrains.annotations.*;
-import org.jspecify.annotations.*;
 import org.yaml.snakeyaml.external.biz.base64Coder.*;
 
 import com.google.gson.*;
@@ -25,45 +24,66 @@ import net.kyori.adventure.text.serializer.plain.*;
 public class HorseDotZipCommand extends Command {
     private static final NamespacedKey DATA_KEY = new NamespacedKey("horsedotzip", "data");
 
-    public static final String CMD_NAME = "horse.zip";
-    private static final String ZIP_CMD = "zip";
-    private static final String UNZIP_CMD = "unzip";
-    private static final String DEBUG_CMD = "debug";
-    private static final String DEBUG_OUTPUT_CMD = "output";
+    public static final String CMD_NAME = "horsedotzip";
+    private static final String ZIP_SUB_CMD = "zip";
+    private static final String UNZIP_SUB_CMD = "unzip";
+    private static final String DEBUG_SUB_CMD = "debug";
+    private static final String DEBUG_OUTPUT_SUB_CMD = "output";
+    private static final String ZIP_CMD = "horse." + ZIP_SUB_CMD;
+    private static final String UNZIP_CMD = "horse." + UNZIP_SUB_CMD;
 
     private static final Gson GSON = new Gson();
 
     public HorseDotZipCommand() {
-        super(CMD_NAME, "Zip your rideable mob into a saddle", "/horse.zip <save|release|debug>", List.of());
+        super(CMD_NAME, "Zip your rideable mob into a saddle", "/horsedotzip <zip|unzip|debug>", List.of());
+        setAliases(List.of("horse.zip", "horse.unzip"));
     }
 
     @Override
-    public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String @NotNull [] args) throws IllegalArgumentException {
-        if (args.length == 1) {
-            return List.of(ZIP_CMD, UNZIP_CMD, DEBUG_CMD);
-        }
-        if (args.length == 2 && args[0].equalsIgnoreCase(DEBUG_CMD)) {
-            return List.of(DEBUG_OUTPUT_CMD);
+    public @NotNull List<String> tabComplete(@NotNull CommandSender sender,
+                                             @NotNull String alias,
+                                             @NotNull String @NotNull [] args) throws IllegalArgumentException {
+        if (CMD_NAME.equalsIgnoreCase(alias)) {
+            if (args.length == 1) {
+                return List.of(ZIP_SUB_CMD, UNZIP_SUB_CMD, DEBUG_SUB_CMD);
+            }
+            if (args.length == 2 && args[0].equalsIgnoreCase(DEBUG_SUB_CMD)) {
+                return List.of(DEBUG_OUTPUT_SUB_CMD);
+            }
         }
         return List.of();
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String @NotNull [] args) {
+    public boolean execute(@NotNull CommandSender sender, @NotNull String alias, @NotNull String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(Component.text("Only players can use this command.", NamedTextColor.RED));
             return true;
         }
 
-        if (args.length == 0) {
-            return false;
-        }
-
-        switch (args[0].toLowerCase()) {
-            case "zip" -> saveRideable(player);
-            case "unzip" -> releaseRideable(player);
-            case "debug" -> handleDebug(player, args);
-            default -> player.sendMessage(Component.text("Unknown sub-command.", NamedTextColor.RED));
+        if (CMD_NAME.equalsIgnoreCase(alias)) {
+            if (args.length == 0) {
+                sender.sendMessage(Component.text("Usage: /horsedotzip <zip|unzip|debug>", NamedTextColor.RED));
+                return false;
+            }
+            switch (args[0].toLowerCase()) {
+                case ZIP_SUB_CMD -> saveRideable(player);
+                case UNZIP_SUB_CMD -> releaseRideable(player);
+                case DEBUG_SUB_CMD -> handleDebug(player, args);
+                default -> {
+                    player.sendMessage(Component.text("Unknown sub-command.", NamedTextColor.RED));
+                    return false;
+                }
+            }
+        } else {
+            switch (alias.toLowerCase()) {
+                case ZIP_CMD -> saveRideable(player);
+                case UNZIP_CMD -> releaseRideable(player);
+                default -> {
+                    player.sendMessage(Component.text("Unknown sub-command.", NamedTextColor.RED));
+                    return false;
+                }
+            }
         }
         return true;
     }
@@ -220,7 +240,7 @@ public class HorseDotZipCommand extends Command {
         }
         ItemStack item = player.getInventory().getItemInMainHand();
 
-        if (DEBUG_OUTPUT_CMD.equalsIgnoreCase(args[1])) {
+        if (DEBUG_OUTPUT_SUB_CMD.equalsIgnoreCase(args[1])) {
             String data = item.getItemMeta().getPersistentDataContainer().get(DATA_KEY, PersistentDataType.STRING);
             if (data != null) {
                 player.sendMessage(Component.text(data)
