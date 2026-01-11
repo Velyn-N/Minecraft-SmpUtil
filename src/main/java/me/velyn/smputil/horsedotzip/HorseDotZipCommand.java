@@ -27,16 +27,18 @@ public class HorseDotZipCommand extends Command {
     public static final String CMD_NAME = "horsedotzip";
     private static final String ZIP_SUB_CMD = "zip";
     private static final String UNZIP_SUB_CMD = "unzip";
+    private static final String CHECK_SUB_CMD = "check";
     private static final String DEBUG_SUB_CMD = "debug";
     private static final String DEBUG_OUTPUT_SUB_CMD = "output";
     private static final String ZIP_CMD = "horse." + ZIP_SUB_CMD;
     private static final String UNZIP_CMD = "horse." + UNZIP_SUB_CMD;
+    private static final String CHECK_CMD = "horse." + CHECK_SUB_CMD;
 
     private static final Gson GSON = new Gson();
 
     public HorseDotZipCommand() {
-        super(CMD_NAME, "Zip your rideable mob into a saddle", "/horsedotzip <zip|unzip|debug>", List.of());
-        setAliases(List.of("horse.zip", "horse.unzip"));
+        super(CMD_NAME, "Zip your rideable mob into a saddle", "/horsedotzip <zip|unzip|check|debug>", List.of());
+        setAliases(List.of(ZIP_CMD, UNZIP_CMD, CHECK_CMD));
     }
 
     @Override
@@ -45,7 +47,7 @@ public class HorseDotZipCommand extends Command {
                                              @NotNull String @NotNull [] args) throws IllegalArgumentException {
         if (CMD_NAME.equalsIgnoreCase(alias)) {
             if (args.length == 1) {
-                return List.of(ZIP_SUB_CMD, UNZIP_SUB_CMD, DEBUG_SUB_CMD);
+                return List.of(ZIP_SUB_CMD, UNZIP_SUB_CMD, CHECK_SUB_CMD, DEBUG_SUB_CMD);
             }
             if (args.length == 2 && args[0].equalsIgnoreCase(DEBUG_SUB_CMD)) {
                 return List.of(DEBUG_OUTPUT_SUB_CMD);
@@ -63,12 +65,13 @@ public class HorseDotZipCommand extends Command {
 
         if (CMD_NAME.equalsIgnoreCase(alias)) {
             if (args.length == 0) {
-                sender.sendMessage(Component.text("Usage: /horsedotzip <zip|unzip|debug>", NamedTextColor.RED));
+                sender.sendMessage(Component.text("Usage: /horsedotzip <zip|unzip|check|debug>", NamedTextColor.RED));
                 return false;
             }
             switch (args[0].toLowerCase()) {
                 case ZIP_SUB_CMD -> saveRideable(player);
                 case UNZIP_SUB_CMD -> releaseRideable(player);
+                case CHECK_SUB_CMD -> checkRideable(player);
                 case DEBUG_SUB_CMD -> handleDebug(player, args);
                 default -> {
                     player.sendMessage(Component.text("Unknown sub-command.", NamedTextColor.RED));
@@ -79,6 +82,7 @@ public class HorseDotZipCommand extends Command {
             switch (alias.toLowerCase()) {
                 case ZIP_CMD -> saveRideable(player);
                 case UNZIP_CMD -> releaseRideable(player);
+                case CHECK_CMD -> checkRideable(player);
                 default -> {
                     player.sendMessage(Component.text("Unknown sub-command.", NamedTextColor.RED));
                     return false;
@@ -86,6 +90,20 @@ public class HorseDotZipCommand extends Command {
             }
         }
         return true;
+    }
+
+    private void checkRideable(Player player) {
+        Entity vehicle = player.getVehicle();
+        if (!(vehicle instanceof AbstractHorse horse)) {
+            player.sendMessage(Component.text("You must be riding a horse, donkey, mule, camel, or llama!", NamedTextColor.RED));
+            return;
+        }
+        Component message = Component.text("Running diagnostics on ", NamedTextColor.GRAY)
+                .append(horse.customName() != null ? horse.customName() : Component.text(horse.getType().name()))
+                .append(Component.text("...", NamedTextColor.GRAY))
+                .append(Component.newline())
+                .append(getHorseStats(horse));
+        player.sendMessage(message);
     }
 
     private void saveRideable(Player player) {
