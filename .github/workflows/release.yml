@@ -1,0 +1,52 @@
+name: Build Jar & Attach to Release
+
+on:
+  workflow_dispatch: # for manual trigger
+  push:
+    tags:
+      - 'v*' # for semantic versioning tags
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Extract tag name
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Update pom.xml with the tag version
+        run: mvn versions:set -DnewVersion=${{ env.VERSION }}
+
+      - name: Build with Maven
+        run: mvn clean package
+
+      - name: Clean up artifacts
+        run: rm target/original-*.jar
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build Artifacts
+          path: |
+            target/*.jar
+
+      - name: Upload JAR to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
