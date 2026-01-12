@@ -213,7 +213,7 @@ public class HorseDotZipCommand extends Command {
         }
     }
 
-    private void applyData(AbstractHorse horse, JsonObject json) throws Exception {
+    private void applyData(AbstractHorse horse, JsonObject json) {
         if (json.has("name")) {
             horse.customName(Component.text(json.get("name").getAsString()));
         }
@@ -272,26 +272,27 @@ public class HorseDotZipCommand extends Command {
      * Standard Bukkit Base64 Serialization for ItemStacks
      */
     private String itemStackArrayToBase64(ItemStack[] items) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream)) {
-            dataOutput.writeInt(items.length);
-            for (ItemStack item : items) {
-                dataOutput.writeObject(item);
-            }
-            return Base64Coder.encodeLines(outputStream.toByteArray());
+        try {
+            return Base64Coder.encodeLines(ItemStack.serializeItemsAsBytes(items));
         } catch (Exception e) {
             return "";
         }
     }
 
-    private ItemStack[] itemStackArrayFromBase64(String data) throws Exception {
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
-             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream)) {
-            ItemStack[] items = new ItemStack[dataInput.readInt()];
-            for (int i = 0; i < items.length; i++) {
-                items[i] = (ItemStack) dataInput.readObject();
+    private ItemStack[] itemStackArrayFromBase64(String data) {
+        try {
+            return ItemStack.deserializeItemsFromBytes(Base64Coder.decodeLines(data));
+        } catch (Exception e) {
+            try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
+                 BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream)) {
+                ItemStack[] items = new ItemStack[dataInput.readInt()];
+                for (int i = 0; i < items.length; i++) {
+                    items[i] = (ItemStack) dataInput.readObject();
+                }
+                return items;
+            } catch (Exception ignored) {
+                return new ItemStack[0];
             }
-            return items;
         }
     }
 }
