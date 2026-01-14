@@ -131,8 +131,13 @@ public class HorseDotZipCommand extends Command {
 
         saddle.setItemMeta(meta);
         horse.remove();
-        player.getInventory().addItem(saddle);
+        HashMap<Integer, ItemStack> unstoredItems = player.getInventory().addItem(saddle);
+        unstoredItems.forEach((slot, item) ->
+                player.getWorld().dropItemNaturally(player.getLocation(), item));
         player.sendMessage(Component.text("Mob compressed into saddle!", NamedTextColor.GREEN));
+        if (!unstoredItems.isEmpty()) {
+            player.sendMessage(Component.text("The saddle has been dropped as your inventory is full!", NamedTextColor.YELLOW));
+        }
     }
 
     private Component getHorseStats(AbstractHorse horse) {
