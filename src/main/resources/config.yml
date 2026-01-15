@@ -1,3 +1,13 @@
 debug: false
+
 block-farmland-trample: true
 allow-farmland-trample-when-sneaking: false
+
+horse-dot-zip: true
+
+item-chat:
+  enabled: true
+  # What a player has to type in chat to trigger the item
+  placeholders:
+    - "!item"
+    - "[item]"

@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.github.roleplaycauldron.spellbook.core.*;
 
 import me.velyn.smputil.horsedotzip.*;
+import me.velyn.smputil.itemchat.*;
 import me.velyn.smputil.notrample.*;
 
 public final class SmpUtil extends JavaPlugin {
@@ -39,6 +40,9 @@ public final class SmpUtil extends JavaPlugin {
 
         if (config.blockFarmlandTrample) {
             pm.registerEvents(new TrampleBlockListener(log, config), this);
+        }
+        if (config.itemChatEnabled) {
+            pm.registerEvents(new ChatListener(config), this);
         }
     }
 
