@@ -38,7 +38,7 @@ public class HorseDotZipCommand extends Command {
 
     public HorseDotZipCommand() {
         super(CMD_NAME, "Zip your rideable mob into a saddle", "/horsedotzip <zip|unzip|check|debug>", List.of());
-        setAliases(List.of(ZIP_CMD, UNZIP_CMD, CHECK_CMD));
+        setAliases(List.of(ZIP_CMD, UNZIP_CMD, CHECK_CMD, ZIP_SUB_CMD, UNZIP_SUB_CMD));
     }
 
     @Override
@@ -83,6 +83,8 @@ public class HorseDotZipCommand extends Command {
                 case ZIP_CMD -> saveRideable(player);
                 case UNZIP_CMD -> releaseRideable(player);
                 case CHECK_CMD -> checkRideable(player);
+                case ZIP_SUB_CMD -> saveRideable(player);
+                case UNZIP_SUB_CMD -> releaseRideable(player);
                 default -> {
                     player.sendMessage(Component.text("Unknown sub-command.", NamedTextColor.RED));
                     return false;
