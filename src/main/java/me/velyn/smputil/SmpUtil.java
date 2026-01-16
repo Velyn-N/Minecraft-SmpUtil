@@ -41,6 +41,9 @@ public final class SmpUtil extends JavaPlugin {
         if (config.blockFarmlandTrample) {
             pm.registerEvents(new TrampleBlockListener(log, config), this);
         }
+        if (config.horseDotZip) {
+            pm.registerEvents(new HorseDotZipInteractionListener(this), this);
+        }
         if (config.itemChatEnabled) {
             pm.registerEvents(new ChatListener(config), this);
         }
