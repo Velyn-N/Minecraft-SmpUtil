@@ -67,14 +67,22 @@ public class HorseDotZipCommand extends Command {
                 return false;
             }
             Entity vehicle = player.getVehicle();
-            if (!(vehicle instanceof AbstractHorse horse)) {
-                player.sendMessage(Component.text("You must be riding a horse, donkey, mule, camel, or llama!", NamedTextColor.RED));
-                return false;
-            }
             switch (args[0].toLowerCase()) {
-                case ZIP_SUB_CMD -> saveRideable(player, horse);
+                case ZIP_SUB_CMD -> {
+                    if (!(vehicle instanceof AbstractHorse horse)) {
+                        player.sendMessage(Component.text("You must be riding a horse, donkey, mule, camel, or llama!", NamedTextColor.RED));
+                        return false;
+                    }
+                    saveRideable(player, horse);
+                }
                 case UNZIP_SUB_CMD -> releaseRideable(player);
-                case CHECK_SUB_CMD -> checkRideable(player, horse);
+                case CHECK_SUB_CMD -> {
+                    if (!(vehicle instanceof AbstractHorse horse)) {
+                        player.sendMessage(Component.text("You must be riding a horse, donkey, mule, camel, or llama!", NamedTextColor.RED));
+                        return false;
+                    }
+                    checkRideable(player, horse);
+                }
                 case DEBUG_SUB_CMD -> handleDebug(player, args);
                 default -> {
                     player.sendMessage(Component.text("Unknown sub-command.", NamedTextColor.RED));
@@ -83,14 +91,22 @@ public class HorseDotZipCommand extends Command {
             }
         } else {
             Entity vehicle = player.getVehicle();
-            if (!(vehicle instanceof AbstractHorse horse)) {
-                player.sendMessage(Component.text("You must be riding a horse, donkey, mule, camel, or llama!", NamedTextColor.RED));
-                return false;
-            }
             switch (alias.toLowerCase()) {
-                case ZIP_CMD, ZIP_SUB_CMD -> saveRideable(player, horse);
+                case ZIP_CMD, ZIP_SUB_CMD -> {
+                    if (!(vehicle instanceof AbstractHorse horse)) {
+                        player.sendMessage(Component.text("You must be riding a horse, donkey, mule, camel, or llama!", NamedTextColor.RED));
+                        return false;
+                    }
+                    saveRideable(player, horse);
+                }
                 case UNZIP_CMD, UNZIP_SUB_CMD -> releaseRideable(player);
-                case CHECK_CMD -> checkRideable(player, horse);
+                case CHECK_CMD -> {
+                    if (!(vehicle instanceof AbstractHorse horse)) {
+                        player.sendMessage(Component.text("You must be riding a horse, donkey, mule, camel, or llama!", NamedTextColor.RED));
+                        return false;
+                    }
+                    checkRideable(player, horse);
+                }
                 default -> {
                     player.sendMessage(Component.text("Unknown sub-command.", NamedTextColor.RED));
                     return false;
