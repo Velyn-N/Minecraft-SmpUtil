@@ -7,6 +7,7 @@ horse-dot-zip: true
 
 item-chat:
   enabled: true
+  replace-with-item-name: true
   # What a player has to type in chat to trigger the item
   placeholders:
     - "!item"

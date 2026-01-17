@@ -15,6 +15,7 @@ public class PluginConfig {
 
     public boolean itemChatEnabled;
     public List<String> itemChatPlaceholders;
+    public boolean itemChatReplaceWithItemName;
 
     public void apply(ConfigurationSection config) {
         debug = config.getBoolean("debug", false);
@@ -28,5 +29,6 @@ public class PluginConfig {
         if (itemChatPlaceholders.isEmpty()) {
             itemChatPlaceholders = List.of("!item", "[item]");
         }
+        itemChatReplaceWithItemName = config.getBoolean("item-chat.replace-with-item-name", true);
     }
 }
