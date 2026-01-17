@@ -6,7 +6,7 @@
 
   <groupId>me.velyn</groupId>
   <artifactId>smp-util</artifactId>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
   <name>smp-util</name>
